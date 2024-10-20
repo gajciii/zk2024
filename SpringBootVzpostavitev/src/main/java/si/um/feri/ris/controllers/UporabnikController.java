@@ -228,6 +228,11 @@ public class UporabnikController {
         return uporabnikDao.najdiUporabnikeKiSoDonirali();
     }
 
+    @GetMapping("veckratniDonatorji2")
+    public List<Uporabnik> pridobiVeckratneDonatorje2() {
+        return uporabnikDao.najdiVeckratneDonatorje();
+    }
+
 
     @GetMapping("/DonatorjiNad10")
     public List<Uporabnik> pridobiDonatorjeZnesekVecjiOd10() {
