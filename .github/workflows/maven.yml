@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-backend:
     runs-on: ubuntu-latest
 
     services:
@@ -48,3 +48,23 @@ jobs:
 
     - name: Run tests with Maven
       run: mvn -f SpringBootVzpostavitev/pom.xml test
+
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      working-directory: ./Frontend
+      run: npm install
+
+    - name: Build project
+      working-directory: ./Frontend
+      run: npm start &

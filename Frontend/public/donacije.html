@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donacije - Auxilium</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a href="/" class="logo">Auxilium</a>
+                <ul class="nav-links">
+                    <li><a href="/">Domov</a></li>
+                    <li><a href="/uporabniki.html">Uporabniki</a></li>
+                    <li><a href="/donacije.html">Donacije</a></li>
+                    <li><a href="/nesrece.html">Nesreče</a></li>
+                    <li><a href="/oskodovanci.html">Oškodovanci</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="container">
+        <h1>Donacije</h1>
+        
+        <div id="errorMessage" class="alert alert-error" style="display: none;"></div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Znesek</th>
+                        <th>Datum donacije</th>
+                        <th>Način plačila</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="donacijeTable">
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Nalaganje...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-section">
+            <h2>Dodaj novo donacijo</h2>
+            <form id="donacijaForm">
+                <div class="form-group">
+                    <label for="znesek">Znesek (€):</label>
+                    <input type="number" id="znesek" name="znesek" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="nacinPlacila">Način plačila:</label>
+                    <input type="text" id="nacinPlacila" name="nacinPlacila" required>
+                </div>
+                <div class="form-group">
+                    <label for="uporabnikId">ID Uporabnika:</label>
+                    <input type="number" id="uporabnikId" name="uporabnikId" required>
+                </div>
+                <button type="submit" class="btn">Dodaj donacijo</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Auxilium - Sistem za upravljanje pomoči v nesrečah</p>
+        </div>
+    </footer>
+
+    <script src="/js/donacije.js"></script>
+</body>
+</html>
