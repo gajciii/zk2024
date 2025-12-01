@@ -5,7 +5,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import si.um.feri.ris.repository.ListNesrec;
 
-import java.util.ArrayList;
 import java.util.List;
 @Entity
 public class Uporabnik {
@@ -21,9 +20,7 @@ public class Uporabnik {
             joinColumns = @JoinColumn(name = "uporabnik_id"),
             inverseJoinColumns = @JoinColumn(name = "donacija_id")
     )
-    private List<Donacija> donacije = new ArrayList<>();  // Initialize the list here
-
-    //List<Donacija> donacije;
+    List<Donacija> donacije;
 
 
     private String ime;
