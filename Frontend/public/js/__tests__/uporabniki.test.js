@@ -19,6 +19,9 @@ document.body.innerHTML = `
 // Importamo kodo direktno z require za coverage
 require('../uporabniki.js');
 
+// Dostopamo do funkcije preko global objekta
+const loadUporabniki = global.loadUporabniki;
+
 describe('Uporabniki Tests', () => {
     beforeEach(() => {
         fetch.mockClear();

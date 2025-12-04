@@ -12,6 +12,9 @@ document.body.innerHTML = `
 // Importamo kodo direktno z require za coverage
 require('../oskodovanci.js');
 
+// Dostopamo do funkcije preko global objekta
+const loadOskodovanci = global.loadOskodovanci;
+
 describe('Oskodovanci Tests', () => {
     beforeEach(() => {
         fetch.mockClear();
