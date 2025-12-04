@@ -174,14 +174,27 @@ describe('Donacije Tests', () => {
     test('Dodajanje donacije - napaka pri network error', async () => {
         const form = document.getElementById('donacijaForm');
 
+        // Mockamo fetch, da se rejecta pri POST requestu
         fetch.mockRejectedValueOnce(new Error('Network error'));
 
         const event = new Event('submit', { bubbles: true, cancelable: true });
         form.dispatchEvent(event);
 
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // Počakajmo na asinhrono operacijo
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Počakajmo še na vse pending promise-e
+        await new Promise(resolve => setImmediate(resolve));
 
+        // Preverimo, da se je fetch poklical
         expect(fetch).toHaveBeenCalled();
-        expect(alert).toHaveBeenCalledWith(expect.stringContaining('Napaka:'));
+        
+        // Preverimo, da se je poklical alert z napako
+        // Alert se pokliče z "Napaka: Network error"
+        const alertCalls = alert.mock.calls;
+        const hasErrorAlert = alertCalls.some(call => 
+            call[0] && typeof call[0] === 'string' && call[0].startsWith('Napaka:')
+        );
+        expect(hasErrorAlert).toBe(true);
     });
 });
