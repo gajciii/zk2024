@@ -102,7 +102,8 @@ describe('Donacije Tests', () => {
         const form = document.getElementById('donacijaForm');
 
         fetch.mockResolvedValueOnce({
-            ok: false
+            ok: false,
+            json: async () => ({ error: 'Napaka' })
         });
 
         const event = new Event('submit', { bubbles: true, cancelable: true });
@@ -111,6 +112,8 @@ describe('Donacije Tests', () => {
         await new Promise(resolve => setTimeout(resolve, 200));
 
         expect(fetch).toHaveBeenCalled();
-        expect(alert).toHaveBeenCalledWith('Napaka pri dodajanju donacije');
+        const alertCalls = alert.mock.calls;
+        const hasErrorAlert = alertCalls.some(call => call[0] === 'Napaka pri dodajanju donacije');
+        expect(hasErrorAlert).toBe(true);
     });
 });
