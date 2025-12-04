@@ -29,12 +29,7 @@ async function loadDonacije() {
     }
 }
 
-if (typeof global !== 'undefined') {
-    global.loadDonacije = loadDonacije;
-} else if (typeof window !== 'undefined') {
-    window.loadDonacije = loadDonacije;
-}
-
+// Event listener samo če element obstaja
 if (document.getElementById('donacijaForm')) {
     document.getElementById('donacijaForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -69,6 +64,7 @@ if (document.getElementById('donacijaForm')) {
     });
 }
 
+// Auto-load samo če ni v test okolju
 if (typeof jest === 'undefined') {
     loadDonacije();
 }

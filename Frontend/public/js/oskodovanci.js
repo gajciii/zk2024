@@ -29,12 +29,7 @@ async function loadOskodovanci() {
     }
 }
 
-if (typeof global !== 'undefined') {
-    global.loadOskodovanci = loadOskodovanci;
-} else if (typeof window !== 'undefined') {
-    window.loadOskodovanci = loadOskodovanci;
-}
-
+// Auto-load samo če ni v test okolju
 if (typeof jest === 'undefined') {
     loadOskodovanci();
 }

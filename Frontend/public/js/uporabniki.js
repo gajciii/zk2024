@@ -29,12 +29,7 @@ async function loadUporabniki() {
     }
 }
 
-if (typeof global !== 'undefined') {
-    global.loadUporabniki = loadUporabniki;
-} else if (typeof window !== 'undefined') {
-    window.loadUporabniki = loadUporabniki;
-}
-
+// Event listener samo če element obstaja
 if (document.getElementById('uporabnikForm')) {
     document.getElementById('uporabnikForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -68,6 +63,7 @@ if (document.getElementById('uporabnikForm')) {
     });
 }
 
+// Auto-load samo če ni v test okolju
 if (typeof jest === 'undefined') {
     loadUporabniki();
 }

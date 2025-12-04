@@ -29,12 +29,7 @@ async function loadNesrece() {
     }
 }
 
-if (typeof global !== 'undefined') {
-    global.loadNesrece = loadNesrece;
-} else if (typeof window !== 'undefined') {
-    window.loadNesrece = loadNesrece;
-}
-
+// Auto-load samo če ni v test okolju
 if (typeof jest === 'undefined') {
     loadNesrece();
 }

@@ -12,9 +12,6 @@ document.body.innerHTML = `
 // Importamo kodo direktno z require za coverage
 require('../nesrece.js');
 
-// Dostopamo do funkcije preko global objekta
-const loadNesrece = global.loadNesrece;
-
 describe('Nesrece Tests', () => {
     beforeEach(() => {
         fetch.mockClear();

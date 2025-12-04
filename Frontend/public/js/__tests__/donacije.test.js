@@ -18,9 +18,6 @@ document.body.innerHTML = `
 // Importamo kodo direktno z require za coverage
 require('../donacije.js');
 
-// Dostopamo do funkcije preko global objekta
-const loadDonacije = global.loadDonacije;
-
 describe('Donacije Tests', () => {
     beforeEach(() => {
         fetch.mockClear();
