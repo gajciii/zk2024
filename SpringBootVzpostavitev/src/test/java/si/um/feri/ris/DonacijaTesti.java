@@ -106,5 +106,27 @@ public class DonacijaTesti {
         
         assertNull(donacija);
     }
+
+    // Testira pridobivanje vseh donacij
+    @Test
+    @Transactional
+    public void testPrikaziVseDonacije() {
+        Donacija donacija1 = new Donacija();
+        donacija1.setZnesekDonacije(100.0);
+        donacijaDAO.save(donacija1);
+        
+        Donacija donacija2 = new Donacija();
+        donacija2.setZnesekDonacije(200.0);
+        donacijaDAO.save(donacija2);
+        
+        Iterable<Donacija> vseDonacije = donacijaController.prikaziDonacijo();
+        
+        assertNotNull(vseDonacije);
+        int count = 0;
+        for (@SuppressWarnings("unused") Donacija d : vseDonacije) {
+            count++;
+        }
+        assertEquals(2, count);
+    }
 }
 
