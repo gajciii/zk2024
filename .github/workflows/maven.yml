@@ -61,16 +61,12 @@ jobs:
 
   build-frontend:
     runs-on: ubuntu-latest
+    container: node:18
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-    
     - name: Install dependencies
       working-directory: ./Frontend
       run: npm install
