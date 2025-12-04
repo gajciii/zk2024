@@ -29,4 +29,12 @@ async function loadOskodovanci() {
     }
 }
 
-loadOskodovanci();
+if (typeof global !== 'undefined') {
+    global.loadOskodovanci = loadOskodovanci;
+} else if (typeof window !== 'undefined') {
+    window.loadOskodovanci = loadOskodovanci;
+}
+
+if (typeof jest === 'undefined') {
+    loadOskodovanci();
+}

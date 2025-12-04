@@ -29,7 +29,14 @@ async function loadDonacije() {
     }
 }
 
-document.getElementById('donacijaForm').addEventListener('submit', async (e) => {
+if (typeof global !== 'undefined') {
+    global.loadDonacije = loadDonacije;
+} else if (typeof window !== 'undefined') {
+    window.loadDonacije = loadDonacije;
+}
+
+if (document.getElementById('donacijaForm')) {
+    document.getElementById('donacijaForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = {
@@ -59,6 +66,9 @@ document.getElementById('donacijaForm').addEventListener('submit', async (e) => 
     } catch (error) {
         alert('Napaka: ' + error.message);
     }
-});
+    });
+}
 
-loadDonacije();
+if (typeof jest === 'undefined') {
+    loadDonacije();
+}

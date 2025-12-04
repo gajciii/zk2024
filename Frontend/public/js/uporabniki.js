@@ -29,7 +29,14 @@ async function loadUporabniki() {
     }
 }
 
-document.getElementById('uporabnikForm').addEventListener('submit', async (e) => {
+if (typeof global !== 'undefined') {
+    global.loadUporabniki = loadUporabniki;
+} else if (typeof window !== 'undefined') {
+    window.loadUporabniki = loadUporabniki;
+}
+
+if (document.getElementById('uporabnikForm')) {
+    document.getElementById('uporabnikForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = {
@@ -58,6 +65,9 @@ document.getElementById('uporabnikForm').addEventListener('submit', async (e) =>
     } catch (error) {
         alert('Napaka: ' + error.message);
     }
-});
+    });
+}
 
-loadUporabniki();
+if (typeof jest === 'undefined') {
+    loadUporabniki();
+}

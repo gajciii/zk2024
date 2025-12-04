@@ -29,4 +29,12 @@ async function loadNesrece() {
     }
 }
 
-loadNesrece();
+if (typeof global !== 'undefined') {
+    global.loadNesrece = loadNesrece;
+} else if (typeof window !== 'undefined') {
+    window.loadNesrece = loadNesrece;
+}
+
+if (typeof jest === 'undefined') {
+    loadNesrece();
+}

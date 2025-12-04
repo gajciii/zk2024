@@ -16,14 +16,11 @@ document.body.innerHTML = `
     </form>
 `;
 
-const fs = require('fs');
-const path = require('path');
-const uporabnikiCode = fs.readFileSync(
-    path.join(__dirname, '../uporabniki.js'),
-    'utf8'
-);
+// Importamo kodo direktno z require za coverage
+require('../uporabniki.js');
 
-eval(uporabnikiCode.replace('loadUporabniki();', ''));
+// Dostopamo do funkcije preko global objekta
+const loadUporabniki = global.loadUporabniki;
 
 describe('Uporabniki Tests', () => {
     beforeEach(() => {

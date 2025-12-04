@@ -9,14 +9,11 @@ document.body.innerHTML = `
     <div id="errorMessage" style="display: none;"></div>
 `;
 
-const fs = require('fs');
-const path = require('path');
-const nesreceCode = fs.readFileSync(
-    path.join(__dirname, '../nesrece.js'),
-    'utf8'
-);
+// Importamo kodo direktno z require za coverage
+require('../nesrece.js');
 
-eval(nesreceCode.replace('loadNesrece();', ''));
+// Dostopamo do funkcije preko global objekta
+const loadNesrece = global.loadNesrece;
 
 describe('Nesrece Tests', () => {
     beforeEach(() => {
