@@ -103,17 +103,17 @@ describe('Donacije Tests', () => {
 
         fetch.mockResolvedValueOnce({
             ok: false,
+            status: 400,
             json: async () => ({ error: 'Napaka' })
         });
 
         const event = new Event('submit', { bubbles: true, cancelable: true });
         form.dispatchEvent(event);
 
+        // Počakajmo na asinhrono operacijo
         await new Promise(resolve => setTimeout(resolve, 200));
 
         expect(fetch).toHaveBeenCalled();
-        const alertCalls = alert.mock.calls;
-        const hasErrorAlert = alertCalls.some(call => call[0] === 'Napaka pri dodajanju donacije');
-        expect(hasErrorAlert).toBe(true);
+        expect(alert).toHaveBeenCalledWith('Napaka pri dodajanju donacije');
     });
 });
