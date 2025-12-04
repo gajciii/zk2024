@@ -29,4 +29,7 @@ async function loadOskodovanci() {
     }
 }
 
-loadOskodovanci();
+// Auto-load samo če ni v test okolju
+if (typeof jest === 'undefined') {
+    loadOskodovanci();
+}
