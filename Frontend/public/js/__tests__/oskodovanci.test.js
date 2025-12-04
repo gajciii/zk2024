@@ -9,14 +9,8 @@ document.body.innerHTML = `
     <div id="errorMessage" style="display: none;"></div>
 `;
 
-const fs = require('fs');
-const path = require('path');
-const oskodovanciCode = fs.readFileSync(
-    path.join(__dirname, '../oskodovanci.js'),
-    'utf8'
-);
-
-eval(oskodovanciCode.replace('loadOskodovanci();', ''));
+// Importamo kodo direktno z require za coverage
+require('../oskodovanci.js');
 
 describe('Oskodovanci Tests', () => {
     beforeEach(() => {
