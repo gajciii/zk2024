@@ -33,6 +33,7 @@ public class UporabnikTesti {
         donacijaDao.deleteAll();
     }
 
+    // Testira neuspešno prijavo uporabnika z napačnim geslom
     @Test
     @Transactional
     public void testNeuspesnaPrijavaUporabnika() {
@@ -54,8 +55,9 @@ public class UporabnikTesti {
         uporabnikDao.deleteAll();
     }
 
+    // Testira pridobivanje uporabnikov, ki so donirali večkrat
     @Test
-    @Transactional //da so spremembe izvedene preden test preveri rezultate
+    @Transactional
     public void testPridobiVeckratneDonatorje() {
 
         Uporabnik uporabnik1 = new Uporabnik("uporabnisko_ime1", "ime1", "priimek1");
@@ -85,9 +87,10 @@ public class UporabnikTesti {
     }
 
 
+    // Testira pridobivanje donatorjev z zneskom večjim od 100
     @Test
     @Transactional
-    public void testPridobiDonatorjeZnesekVecjiOd100() { //donator z zneskom večjim od 100
+    public void testPridobiDonatorjeZnesekVecjiOd100() {
 
         Uporabnik uporabnik1 = new Uporabnik("uporabnisko_ime1", "ime1", "priimek1");
         uporabnikDao.save(uporabnik1);
@@ -120,6 +123,7 @@ public class UporabnikTesti {
         assertEquals(1, donatorjiNad100.size(), "Število donatorjev nad 100 mora biti 1");
     }
 
+    // Testira uspešno prijavo uporabnika
     @Test
     @Transactional
     public void testUspešnaPrijavaUporabnika() {
@@ -139,6 +143,7 @@ public class UporabnikTesti {
         assertEquals("testUser", response.getBody().getUporabniskoIme());
     }
 
+    // Testira registracijo novega uporabnika
     @Test
     @Transactional
     public void testRegistracijaUporabnika() {
@@ -159,6 +164,7 @@ public class UporabnikTesti {
         assertFalse(uporabniki.isEmpty());
     }
 
+    // Testira pridobivanje uporabnika po ID-ju
     @Test
     @Transactional
     public void testUporabnikID() {
@@ -172,6 +178,7 @@ public class UporabnikTesti {
         assertEquals(uporabnik.getId(), response.getBody().getId());
     }
 
+    // Testira pridobivanje neobstoječega uporabnika
     @Test
     @Transactional
     public void testUporabnikIDNeObstaja() {
@@ -180,6 +187,7 @@ public class UporabnikTesti {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
+    // Testira dodajanje donacije uporabniku
     @Test
     @Transactional
     public void testDodajDonacijoUporabniku() {

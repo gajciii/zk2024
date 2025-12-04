@@ -25,6 +25,7 @@ describe('Oskodovanci Tests', () => {
         document.getElementById('errorMessage').style.display = 'none';
     });
 
+    // Testira uspešno nalaganje oškodovancev v tabelo
     test('loadOskodovanci - uspešno nalaganje oškodovancev', async () => {
         const mockOskodovanci = [
             { id: 1, ime: 'Janez', priimek: 'Novak', naslov: 'Ljubljana', telefon: '123456789' },
@@ -44,6 +45,7 @@ describe('Oskodovanci Tests', () => {
         expect(fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/oskodovanci');
     });
 
+    // Testira prikaz sporočila, ko ni oškodovancev
     test('loadOskodovanci - prazen seznam', async () => {
         fetch.mockResolvedValueOnce({
             ok: true,
@@ -56,6 +58,7 @@ describe('Oskodovanci Tests', () => {
         expect(tableBody.innerHTML).toContain('Ni podatkov');
     });
 
+    // Testira obravnavo napake pri nalaganju oškodovancev
     test('loadOskodovanci - napaka pri fetch', async () => {
         fetch.mockRejectedValueOnce(new Error('Network error'));
 
@@ -66,6 +69,7 @@ describe('Oskodovanci Tests', () => {
         expect(errorMessage.style.display).toBe('block');
     });
 
+    // Testira prikaz N/A za manjkajoče podatke oškodovancev
     test('loadOskodovanci - obravnava manjkajočih podatkov', async () => {
         const mockOskodovanci = [
             { id: 1, ime: null, priimek: null, naslov: null, telefon: null }

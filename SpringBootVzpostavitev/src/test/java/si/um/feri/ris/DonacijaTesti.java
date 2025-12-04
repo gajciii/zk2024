@@ -27,6 +27,7 @@ public class DonacijaTesti {
         donacijaDAO.deleteAll();
     }
 
+    // Testira dodajanje nove donacije
     @Test
     @Transactional
     public void testDodajDonacijo() {
@@ -40,6 +41,7 @@ public class DonacijaTesti {
         assertTrue(response.getBody().contains("100.0"));
     }
 
+    // Testira prikaz donacije po ID-ju
     @Test
     @Transactional
     public void testPrikaziDonacijo() {
@@ -54,6 +56,7 @@ public class DonacijaTesti {
         assertEquals(200.0, najdenaDonacija.getZnesekDonacije());
     }
 
+    // Testira brisanje donacije
     @Test
     @Transactional
     public void testIzbrisiDonacijo() {
@@ -68,6 +71,7 @@ public class DonacijaTesti {
         assertFalse(donacijaDAO.findById(donacijaId).isPresent());
     }
 
+    // Testira brisanje neobstoječe donacije
     @Test
     @Transactional
     public void testIzbrisiDonacijoNeObstaja() {
@@ -76,6 +80,7 @@ public class DonacijaTesti {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
+    // Testira urejanje donacije
     @Test
     @Transactional
     public void testUrediDonacijo() {
@@ -91,6 +96,15 @@ public class DonacijaTesti {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(500.0, response.getBody().getZnesekDonacije());
+    }
+
+    // Testira prikaz neobstoječe donacije
+    @Test
+    @Transactional
+    public void testPrikaziDonacijoNeObstaja() {
+        Donacija donacija = donacijaController.prikaziDonacijo(999L);
+        
+        assertNull(donacija);
     }
 }
 

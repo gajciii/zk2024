@@ -44,9 +44,10 @@ public class AdminiTesti {
     }
 
 
+    // Testira uspešno prijavo administratorja
     @Test
     @Transactional
-    void testPrijavaAdmina() { // uspešna prijava administratorja
+    void testPrijavaAdmina() {
 
         Administrator admin = new Administrator();
         admin.setUporabniskoIme("adminTest");
@@ -62,8 +63,9 @@ public class AdminiTesti {
 
 
 
+    // Testira dodajanje nesreče s strani administratorja
     @Test
-    public void testDodajNesreco() { // dodajanje nesreče
+    public void testDodajNesreco() {
 
         Administrator admin = new Administrator();
         admin.setUporabniskoIme("adminTest");
@@ -90,6 +92,7 @@ public class AdminiTesti {
         administratorDAO.deleteAll();
     }
 
+    // Testira neuspešno prijavo administratorja z napačnim geslom
     @Test
     @Transactional
     void testNeuspesnaPrijavaAdmina() {
@@ -107,6 +110,7 @@ public class AdminiTesti {
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
+    // Testira dodajanje novega administratorja
     @Test
     @Transactional
     void testDodajAdministratorja() {
@@ -120,6 +124,7 @@ public class AdminiTesti {
         assertTrue(response.getBody().contains("uspešno dodan"));
     }
 
+    // Testira registracijo novega administratorja
     @Test
     @Transactional
     void testRegistracijaAdmina() {
@@ -133,6 +138,7 @@ public class AdminiTesti {
         assertTrue(response.getBody().contains("uspešno registriran"));
     }
 
+    // Testira dodajanje oškodovanca s strani administratorja
     @Test
     @Transactional
     void testDodajOskodovanca() {
@@ -147,6 +153,7 @@ public class AdminiTesti {
         assertEquals("Janez", response.getBody().getIme());
     }
 
+    // Testira odstranjevanje oškodovanca s strani administratorja
     @Test
     @Transactional
     void testOdstraniOskodovanca() {

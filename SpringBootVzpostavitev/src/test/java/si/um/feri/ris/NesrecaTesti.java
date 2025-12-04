@@ -42,6 +42,7 @@ public class NesrecaTesti {
         oskodovanecDAO.deleteAll();
     }
 
+    // Testira dodajanje nove nesreče
     @Test
     @Transactional
     public void testDodajNesreco() {
@@ -55,6 +56,7 @@ public class NesrecaTesti {
         assertEquals("Testna lokacija", shranjenaNesreca.getLokacija());
     }
 
+    // Testira pridobivanje nesreče po ID-ju
     @Test
     @Transactional
     public void testVrniNesrecoPoId() {
@@ -68,6 +70,7 @@ public class NesrecaTesti {
         assertEquals(novaNesreca.getId(), response.getBody().getId());
     }
 
+    // Testira pridobivanje neobstoječe nesreče
     @Test
     @Transactional
     public void testVrniNesrecoPoIdNeObstaja() {
@@ -76,6 +79,7 @@ public class NesrecaTesti {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
+    // Testira brisanje nesreče
     @Test
     @Transactional
     public void testOdstraniNesreco() {
@@ -89,6 +93,7 @@ public class NesrecaTesti {
         assertFalse(nesrecaDAO.findById(nesrecaId).isPresent());
     }
 
+    // Testira urejanje nesreče
     @Test
     @Transactional
     public void testUrediNesreco() {
@@ -107,6 +112,7 @@ public class NesrecaTesti {
         assertEquals("Nova lokacija", response.getBody().getLokacija());
     }
 
+    // Testira pridobivanje nesreč z več kot tremi oškodovanci
     @Test
     @Transactional
     public void testNesreceVecKotTriOskodovanci() {
