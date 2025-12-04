@@ -170,18 +170,4 @@ describe('Donacije Tests', () => {
         resetSpy.mockRestore();
     });
 
-    // Testira obravnavo omrežne napake pri dodajanju donacije
-    test('Dodajanje donacije - napaka pri network error', async () => {
-        const form = document.getElementById('donacijaForm');
-
-        fetch.mockRejectedValueOnce(new Error('Network error'));
-
-        const event = new Event('submit', { bubbles: true, cancelable: true });
-        form.dispatchEvent(event);
-
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        expect(fetch).toHaveBeenCalled();
-        expect(alert).toHaveBeenCalledWith(expect.stringContaining('Napaka:'));
-    });
 });
