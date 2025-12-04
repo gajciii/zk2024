@@ -37,6 +37,7 @@ describe('Uporabniki Tests', () => {
         document.getElementById('telefon').value = '123456789';
     });
 
+    // Testira uspešno nalaganje uporabnikov v tabelo
     test('loadUporabniki - uspešno nalaganje uporabnikov', async () => {
         const mockUporabniki = [
             { id: 1, ime: 'Janez', priimek: 'Novak', email: 'janez@example.com', telefon: '123456789' },
@@ -56,6 +57,7 @@ describe('Uporabniki Tests', () => {
         expect(fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/uporabniki');
     });
 
+    // Testira prikaz sporočila, ko ni uporabnikov
     test('loadUporabniki - prazen seznam', async () => {
         fetch.mockResolvedValueOnce({
             ok: true,
@@ -68,6 +70,7 @@ describe('Uporabniki Tests', () => {
         expect(tableBody.innerHTML).toContain('Ni podatkov');
     });
 
+    // Testira obravnavo napake pri nalaganju uporabnikov
     test('loadUporabniki - napaka pri fetch', async () => {
         fetch.mockRejectedValueOnce(new Error('Network error'));
 
@@ -78,6 +81,7 @@ describe('Uporabniki Tests', () => {
         expect(errorMessage.style.display).toBe('block');
     });
 
+    // Testira uspešno dodajanje uporabnika preko forme
     test('Dodajanje uporabnika - uspešno', async () => {
         const form = document.getElementById('uporabnikForm');
 

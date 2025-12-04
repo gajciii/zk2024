@@ -43,6 +43,7 @@ public class OskodovanecTesti {
         administratorDAO.deleteAll();
     }
 
+    // Testira dodajanje novega oškodovanca
     @Test
     @Transactional
     public void testDodajOskodovanca() {
@@ -60,6 +61,7 @@ public class OskodovanecTesti {
         assertEquals("Novak", shranjenOskodovanec.getPriimek());
     }
 
+    // Testira dodajanje donacije oškodovancu
     @Test
     @Transactional
     public void testDodajDonacijoOskodovancu() {
@@ -82,6 +84,7 @@ public class OskodovanecTesti {
         assertTrue(donacijeCount > 0);
     }
 
+    // Testira dodajanje donacije neobstoječemu oškodovancu
     @Test
     @Transactional
     public void testDodajDonacijoOskodovancuNeObstaja() {
@@ -93,6 +96,7 @@ public class OskodovanecTesti {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
+    // Testira brisanje oškodovanca
     @Test
     @Transactional
     public void testIzbrisiOskodovanca() {
@@ -108,6 +112,7 @@ public class OskodovanecTesti {
         assertFalse(oskodovanecDAO.findById(oskodovanecId).isPresent());
     }
 
+    // Testira urejanje oškodovanca
     @Test
     @Transactional
     public void testUrediOskodovanca() {
