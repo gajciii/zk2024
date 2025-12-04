@@ -1,7 +1,6 @@
 package si.um.feri.ris;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,12 +75,12 @@ public class UporabnikTesti {
         donacija3.setZnesekDonacije(300); //donacija spet za uporabnika 1
         uporabnikController.dodajDonacijoUporabniku(uporabnik1.getId(), donacija3);
 
-        List<Uporabnik> veckratniDonatorji2 = uporabnikController.pridobiVeckratneDonatorje2(); //klic metode za večkratne donatorje
+        List<Uporabnik> veckratniDonatorji = uporabnikController.pridobiVeckratneDonatorje(); //klic metode za večkratne donatorje
 
-        assertNotNull(veckratniDonatorji2, "Seznam večkratnih donatorjev ne sme biti null");
-        assertEquals(1, veckratniDonatorji2.size(), "Mora biti samo en večkratni donator");
+        assertNotNull(veckratniDonatorji, "Seznam večkratnih donatorjev ne sme biti null");
+        assertEquals(1, veckratniDonatorji.size(), "Mora biti samo en večkratni donator");
 
-        Uporabnik firstDonor = veckratniDonatorji2.get(0); //preverim da je prvi donator v seznamu dejansko bil returnan
+        Uporabnik firstDonor = veckratniDonatorji.get(0); //preverim da je prvi donator v seznamu dejansko bil returnan
         assertEquals(uporabnik1.getUporabniskoIme(), firstDonor.getUporabniskoIme(),"Prvi donator v seznamu mora biti uporabnik1");
     }
 
