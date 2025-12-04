@@ -1,5 +1,6 @@
 // Mock fetch
 global.fetch = jest.fn();
+global.alert = jest.fn();
 
 // Mock DOM
 document.body.innerHTML = `
@@ -14,40 +15,24 @@ document.body.innerHTML = `
     </form>
 `;
 
-const loadDonacije = async () => {
-    try {
-        const response = await fetch('http://localhost:8080/api/v1/uporabniki/donacije');
-        const donacije = await response.json();
-        
-        const tbody = document.getElementById('donacijeTable');
-        
-        if (donacije.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Ni podatkov</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = donacije.map(d => `
-            <tr>
-                <td>${d.id}</td>
-                <td>${d.znesek} €</td>
-                <td>${d.datumDonacije || 'N/A'}</td>
-                <td>${d.nacinPlacila || 'N/A'}</td>
-                <td>${d.status || 'N/A'}</td>
-            </tr>
-        `).join('');
-        
-    } catch (error) {
-        document.getElementById('errorMessage').textContent = 'Napaka pri pridobivanju donacij';
-        document.getElementById('errorMessage').style.display = 'block';
-        document.getElementById('donacijeTable').innerHTML = '<tr><td colspan="5" style="text-align: center;">Napaka pri nalaganju</td></tr>';
-    }
-};
+const fs = require('fs');
+const path = require('path');
+const donacijeCode = fs.readFileSync(
+    path.join(__dirname, '../donacije.js'),
+    'utf8'
+);
+
+eval(donacijeCode.replace('loadDonacije();', ''));
 
 describe('Donacije Tests', () => {
     beforeEach(() => {
         fetch.mockClear();
+        alert.mockClear();
         document.getElementById('donacijeTable').innerHTML = '';
         document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('znesek').value = '100';
+        document.getElementById('nacinPlacila').value = 'kartica';
+        document.getElementById('uporabnikId').value = '1';
     });
 
     test('loadDonacije - uspešno nalaganje donacij', async () => {
@@ -93,18 +78,39 @@ describe('Donacije Tests', () => {
 
     test('Dodajanje donacije - uspešno', async () => {
         const form = document.getElementById('donacijaForm');
-        
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ id: 1, znesek: 100 })
-        });
 
-        const event = new Event('submit');
+        fetch
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => []
+            })
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ id: 1, znesek: 100 })
+            });
+
+        const event = new Event('submit', { bubbles: true, cancelable: true });
         form.dispatchEvent(event);
 
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         expect(fetch).toHaveBeenCalled();
+        expect(alert).toHaveBeenCalledWith('Donacija uspešno dodana!');
+    });
+
+    test('Dodajanje donacije - napaka', async () => {
+        const form = document.getElementById('donacijaForm');
+
+        fetch.mockResolvedValueOnce({
+            ok: false
+        });
+
+        const event = new Event('submit', { bubbles: true, cancelable: true });
+        form.dispatchEvent(event);
+
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        expect(fetch).toHaveBeenCalled();
+        expect(alert).toHaveBeenCalledWith('Napaka pri dodajanju donacije');
     });
 });
-
