@@ -1,5 +1,6 @@
 // Mock fetch
 global.fetch = jest.fn();
+global.alert = jest.fn();
 
 // Mock DOM
 document.body.innerHTML = `
@@ -15,40 +16,25 @@ document.body.innerHTML = `
     </form>
 `;
 
-const loadUporabniki = async () => {
-    try {
-        const response = await fetch('http://localhost:8080/api/v1/uporabniki');
-        const uporabniki = await response.json();
-        
-        const tbody = document.getElementById('uporabnikiTable');
-        
-        if (uporabniki.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Ni podatkov</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = uporabniki.map(u => `
-            <tr>
-                <td>${u.id}</td>
-                <td>${u.ime}</td>
-                <td>${u.priimek}</td>
-                <td>${u.email}</td>
-                <td>${u.telefon}</td>
-            </tr>
-        `).join('');
-        
-    } catch (error) {
-        document.getElementById('errorMessage').textContent = 'Napaka pri pridobivanju uporabnikov';
-        document.getElementById('errorMessage').style.display = 'block';
-        document.getElementById('uporabnikiTable').innerHTML = '<tr><td colspan="5" style="text-align: center;">Napaka pri nalaganju</td></tr>';
-    }
-};
+const fs = require('fs');
+const path = require('path');
+const uporabnikiCode = fs.readFileSync(
+    path.join(__dirname, '../uporabniki.js'),
+    'utf8'
+);
+
+eval(uporabnikiCode.replace('loadUporabniki();', ''));
 
 describe('Uporabniki Tests', () => {
     beforeEach(() => {
         fetch.mockClear();
+        alert.mockClear();
         document.getElementById('uporabnikiTable').innerHTML = '';
         document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('ime').value = 'Janez';
+        document.getElementById('priimek').value = 'Novak';
+        document.getElementById('email').value = 'janez@example.com';
+        document.getElementById('telefon').value = '123456789';
     });
 
     test('loadUporabniki - uspešno nalaganje uporabnikov', async () => {
@@ -94,25 +80,24 @@ describe('Uporabniki Tests', () => {
 
     test('Dodajanje uporabnika - uspešno', async () => {
         const form = document.getElementById('uporabnikForm');
-        const formData = {
-            ime: 'Janez',
-            priimek: 'Novak',
-            email: 'janez@example.com',
-            telefon: '123456789'
-        };
 
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ id: 1, ...formData })
-        });
+        fetch
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => []
+            })
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ id: 1, ime: 'Janez', priimek: 'Novak' })
+            });
 
-        const event = new Event('submit');
+        const event = new Event('submit', { bubbles: true, cancelable: true });
         form.dispatchEvent(event);
 
         // Počakajmo na asinhrono operacijo
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         expect(fetch).toHaveBeenCalled();
+        expect(alert).toHaveBeenCalledWith('Uporabnik uspešno dodan!');
     });
 });
-
