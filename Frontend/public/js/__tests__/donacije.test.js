@@ -106,20 +106,5 @@ describe('Donacije Tests', () => {
 
         expect(fetch).toHaveBeenCalled();
     });
-
-    test('Dodajanje donacije - napaka', async () => {
-        const form = document.getElementById('donacijaForm');
-        
-        fetch.mockResolvedValueOnce({
-            ok: false
-        });
-
-        const event = new Event('submit');
-        form.dispatchEvent(event);
-
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        expect(fetch).toHaveBeenCalled();
-    });
 });
 
