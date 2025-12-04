@@ -90,5 +90,76 @@ public class AdminiTesti {
         administratorDAO.deleteAll();
     }
 
+    @Test
+    @Transactional
+    void testNeuspesnaPrijavaAdmina() {
+        Administrator admin = new Administrator();
+        admin.setUporabniskoIme("adminTest");
+        admin.setGeslo("adminGeslo");
+        administratorDAO.save(admin);
+
+        Administrator napačenAdmin = new Administrator();
+        napačenAdmin.setUporabniskoIme("adminTest");
+        napačenAdmin.setGeslo("napačnoGeslo");
+
+        ResponseEntity<String> response = administratorController.prijavaAdmina(napačenAdmin);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    @Test
+    @Transactional
+    void testDodajAdministratorja() {
+        Administrator novAdmin = new Administrator();
+        novAdmin.setUporabniskoIme("noviAdmin");
+        novAdmin.setGeslo("geslo123");
+
+        ResponseEntity<String> response = administratorController.dodajAdministratorja(novAdmin);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("uspešno dodan"));
+    }
+
+    @Test
+    @Transactional
+    void testRegistracijaAdmina() {
+        Administrator novAdmin = new Administrator();
+        novAdmin.setUporabniskoIme("noviAdmin");
+        novAdmin.setGeslo("geslo123");
+
+        ResponseEntity<String> response = administratorController.regisracijaAdmina(novAdmin);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("uspešno registriran"));
+    }
+
+    @Test
+    @Transactional
+    void testDodajOskodovanca() {
+        Oskodovanec novOskodovanec = new Oskodovanec();
+        novOskodovanec.setIme("Janez");
+        novOskodovanec.setPriimek("Novak");
+
+        ResponseEntity<Oskodovanec> response = administratorController.dodajOskodovanca(novOskodovanec);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Janez", response.getBody().getIme());
+    }
+
+    @Test
+    @Transactional
+    void testOdstraniOskodovanca() {
+        Oskodovanec oskodovanec = new Oskodovanec();
+        oskodovanec.setIme("Janez");
+        oskodovanec.setPriimek("Novak");
+        oskodovanec = oskodovancevDAO.save(oskodovanec);
+
+        ResponseEntity<String> response = administratorController.odstraniOskodovanca(oskodovanec.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("uspešno odstranjen"));
+    }
+
 }
 

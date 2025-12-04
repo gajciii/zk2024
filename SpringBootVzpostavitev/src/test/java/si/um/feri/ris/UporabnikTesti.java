@@ -120,5 +120,80 @@ public class UporabnikTesti {
         assertEquals(1, donatorjiNad100.size(), "Število donatorjev nad 100 mora biti 1");
     }
 
+    @Test
+    @Transactional
+    public void testUspešnaPrijavaUporabnika() {
+        Uporabnik shranjeniUporabnik = new Uporabnik();
+        shranjeniUporabnik.setUporabniskoIme("testUser");
+        shranjeniUporabnik.setGeslo("pravilnoGeslo");
+        shranjeniUporabnik = uporabnikDao.save(shranjeniUporabnik);
+
+        Uporabnik prijavljeniUporabnik = new Uporabnik();
+        prijavljeniUporabnik.setUporabniskoIme("testUser");
+        prijavljeniUporabnik.setGeslo("pravilnoGeslo");
+
+        ResponseEntity<Uporabnik> response = uporabnikController.prijavaUporabnika(prijavljeniUporabnik);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("testUser", response.getBody().getUporabniskoIme());
+    }
+
+    @Test
+    @Transactional
+    public void testRegistracijaUporabnika() {
+        Uporabnik novUporabnik = new Uporabnik();
+        novUporabnik.setUporabniskoIme("noviUser");
+        novUporabnik.setGeslo("geslo123");
+        novUporabnik.setIme("Janez");
+        novUporabnik.setPriimek("Novak");
+        novUporabnik.setEmail("janez@example.com");
+
+        ResponseEntity<String> response = uporabnikController.registracijaUporabnika(novUporabnik);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("uspešno registriran"));
+        
+        // Preverimo, da je uporabnik shranjen
+        List<Uporabnik> uporabniki = uporabnikDao.findByUporabniskoIme("noviUser");
+        assertFalse(uporabniki.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void testUporabnikID() {
+        Uporabnik uporabnik = new Uporabnik("testUser", "Janez", "Novak");
+        uporabnik = uporabnikDao.save(uporabnik);
+
+        ResponseEntity<Uporabnik> response = uporabnikController.uporabnikID(uporabnik.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(uporabnik.getId(), response.getBody().getId());
+    }
+
+    @Test
+    @Transactional
+    public void testUporabnikIDNeObstaja() {
+        ResponseEntity<Uporabnik> response = uporabnikController.uporabnikID(999L);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    @Transactional
+    public void testDodajDonacijoUporabniku() {
+        Uporabnik uporabnik = new Uporabnik("testUser", "Janez", "Novak");
+        uporabnik = uporabnikDao.save(uporabnik);
+
+        Donacija donacija = new Donacija();
+        donacija.setZnesekDonacije(250.0);
+
+        ResponseEntity<byte[]> response = uporabnikController.dodajDonacijoUporabniku(uporabnik.getId(), donacija);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
 
 }
