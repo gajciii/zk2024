@@ -48,6 +48,12 @@ jobs:
 
     - name: Run tests with Maven
       run: mvn -f SpringBootVzpostavitev/pom.xml test
+    
+    - name: Upload SpringBootVzpostavitev coverage
+      uses: actions/upload-artifact@v3
+      with:
+        name: SpringBootVzpostavitev-coverage
+        path: SpringBootVzpostavitev/coverage
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -68,3 +74,13 @@ jobs:
     - name: Build project
       working-directory: ./Frontend
       run: npm start &
+
+    - name: Run tests with coverage
+    working-directory: ./Frontend
+    run: npm run test -- --coverage --watchAll=false
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Frontend-coverage
+        path: Frontend/coverage
