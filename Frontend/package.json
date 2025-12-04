@@ -25,9 +25,18 @@
   "jest": {
     "testEnvironment": "jsdom",
     "collectCoverageFrom": [
-      "public/js/**/*.js"
+      "public/js/**/*.js",
+      "!public/js/__tests__/**",
+      "!**/node_modules/**"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["text", "lcov", "html"]
+    "coverageReporters": ["text", "lcov", "html"],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/__tests__/"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ]
   }
 }
