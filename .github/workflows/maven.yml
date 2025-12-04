@@ -53,7 +53,7 @@ jobs:
       run: mvn -f SpringBootVzpostavitev/pom.xml test jacoco:report
     
     - name: Upload SpringBootVzpostavitev coverage
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: SpringBootVzpostavitev-coverage
         path: SpringBootVzpostavitev/target/site/jacoco
@@ -85,7 +85,7 @@ jobs:
       run: npm run test -- --coverage --watchAll=false
 
     - name: Upload Frontend coverage artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Frontend-coverage
         path: Frontend/coverage

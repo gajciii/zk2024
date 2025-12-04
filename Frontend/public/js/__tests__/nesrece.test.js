@@ -9,7 +9,6 @@ document.body.innerHTML = `
     <div id="errorMessage" style="display: none;"></div>
 `;
 
-// Import funkcije
 const loadNesrece = async () => {
     try {
         const response = await fetch('http://localhost:8080/api/v1/nesrece');
