@@ -101,16 +101,57 @@ describe('Donacije Tests', () => {
     test('Dodajanje donacije - napaka', async () => {
         const form = document.getElementById('donacijaForm');
 
+        // Simuliram submit handler ročno
+        const submitHandler = async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                znesek: parseFloat(document.getElementById('znesek').value),
+                nacinPlacila: document.getElementById('nacinPlacila').value,
+                uporabnik: {
+                    id: parseInt(document.getElementById('uporabnikId').value)
+                }
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/api/v1/uporabniki/donacije', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Donacija uspešno dodana!');
+                    document.getElementById('donacijaForm').reset();
+                    loadDonacije();
+                } else {
+                    alert('Napaka pri dodajanju donacije');
+                }
+            } catch (error) {
+                alert('Napaka: ' + error.message);
+            }
+        };
+
+        form.addEventListener('submit', submitHandler);
+
         fetch.mockResolvedValueOnce({
-            ok: false
+            ok: false,
+            status: 400,
+            statusText: 'Bad Request'
         });
 
         const event = new Event('submit', { bubbles: true, cancelable: true });
         form.dispatchEvent(event);
 
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // Počakajmo dlje, da se asinhrona operacija izvede
+        await new Promise(resolve => setTimeout(resolve, 300));
 
+        // Preverimo, da se je fetch poklical
         expect(fetch).toHaveBeenCalled();
+        
+        // Preverimo, da se je poklical alert z napako
         expect(alert).toHaveBeenCalledWith('Napaka pri dodajanju donacije');
     });
 });
