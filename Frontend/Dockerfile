@@ -10,11 +10,12 @@ RUN npm install
 # Kopiraj source kodo
 COPY . .
 
-# Gradi aplikacijo ali kopiraj public v dist
-RUN if npm run | grep -q "build"; then \
-      npm run build; \
-    else \
+# Določi ali naj se builda ali kopira public (nastavi z --build-arg SKIP_BUILD=true)
+ARG SKIP_BUILD=false
+RUN if [ "$SKIP_BUILD" = "true" ]; then \
       mkdir -p dist && cp -r public/* dist/; \
+    else \
+      npm run build || (mkdir -p dist && cp -r public/* dist/); \
     fi
 
 FROM nginx:alpine

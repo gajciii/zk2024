@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
@@ -14,5 +14,5 @@ RUN ./mvnw clean package -DskipTests
 # Eksponiraj port
 EXPOSE 8080
 
-# Zagni aplikacijo (uporabi wildcard za JAR ime)
-CMD ["sh", "-c", "java -jar target/*.jar"]
+# Zagni aplikacijo z eksplicitno določenim JAR imenom
+CMD ["sh", "-c", "java -jar $(ls target/*.jar | head -n 1)"]
