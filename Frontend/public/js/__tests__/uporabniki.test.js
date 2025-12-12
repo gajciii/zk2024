@@ -30,7 +30,7 @@ describe('Uporabniki Tests', () => {
         document.getElementById('telefon').value = '123456789';
     });
 
-    // Testira uspešno dodajanje uporabnika preko forme
+    // Testira uspešno dodajanje uporabnika
     test('Dodajanje uporabnika - uspešno', async () => {
         const form = document.getElementById('uporabnikForm');
 
@@ -47,7 +47,6 @@ describe('Uporabniki Tests', () => {
         const event = new Event('submit', { bubbles: true, cancelable: true });
         form.dispatchEvent(event);
 
-        // Počakajmo na asinhrono operacijo
         await new Promise(resolve => setTimeout(resolve, 200));
 
         expect(fetch).toHaveBeenCalled();

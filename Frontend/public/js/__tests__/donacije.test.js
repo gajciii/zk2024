@@ -28,7 +28,7 @@ describe('Donacije Tests', () => {
         document.getElementById('uporabnikId').value = '1';
     });
 
-    // Testira uspešno dodajanje donacije preko forme
+    // Testira uspešno dodajanje donacije
     test('Dodajanje donacije - uspešno', async () => {
         const form = document.getElementById('donacijaForm');
 
