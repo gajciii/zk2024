@@ -1,0 +1,11 @@
+target/
+.git/
+.gitignore
+.DS_Store
+*.iml
+.idea/
+.vscode/
+*.log
+HELP.md
+.mvn/wrapper/maven-wrapper.properties
+mvnw.cmd
