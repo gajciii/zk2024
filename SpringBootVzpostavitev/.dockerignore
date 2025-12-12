@@ -8,3 +8,4 @@ target/
 *.log
 HELP.md
 mvnw.cmd
+!.mvn/

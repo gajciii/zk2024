@@ -2,15 +2,11 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Kopiraj Maven wrapper in konfiguracijo
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
+# Kopiraj vse datoteke
+COPY . .
 
 # Dodeli izvršljive pravice za mvnw
 RUN chmod +x ./mvnw
-
-# Kopiraj source kodo
-COPY src/ ./src/
 
 # Gradi aplikacijo
 RUN ./mvnw clean package -DskipTests
