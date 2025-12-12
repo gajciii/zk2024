@@ -85,6 +85,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
 
+    - name: Check for package-lock.json
+      working-directory: ./Frontend
+      run: |
+        if [ ! -f package-lock.json ]; then
+          echo "Error: package-lock.json is missing. Please commit it to the repository."
+          exit 1
+        fi
+
     - name: Install dependencies
       working-directory: ./Frontend
       run: npm ci
@@ -162,6 +170,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Download frontend build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-build
+        path: Frontend/
+
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
@@ -175,4 +189,5 @@ jobs:
     - name: Deploy to Firebase Hosting
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-      run: firebase deploy --only hosting --token $FIREBASE_TOKEN --non-interactive
+        FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      run: firebase deploy --only hosting --token $FIREBASE_TOKEN --project $FIREBASE_PROJECT_ID --non-interactive
