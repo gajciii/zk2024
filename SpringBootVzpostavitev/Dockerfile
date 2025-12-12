@@ -1,8 +1,8 @@
-FROM openjdk:17-jdk-slim AS backend
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# Kopiraj vse datoteke (podobno kot originalni Dockerfile)
+# Kopiraj vse datoteke
 COPY . .
 
 # Dodeli izvršljive pravice za mvnw
@@ -14,5 +14,5 @@ RUN ./mvnw clean package -DskipTests
 # Eksponiraj port
 EXPOSE 8080
 
-# Zagni aplikacijo
-CMD ["java", "-jar", "target/ris-0.0.1-SNAPSHOT.jar"]
+# Zagni aplikacijo (uporabi wildcard za JAR ime)
+CMD ["sh", "-c", "java -jar target/*.jar"]

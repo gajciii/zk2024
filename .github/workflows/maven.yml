@@ -38,14 +38,6 @@ jobs:
         cache: 'maven'
         cache-dependency-path: 'SpringBootVzpostavitev/pom.xml'
 
-    - name: Cache Maven dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-maven-${{ hashFiles('SpringBootVzpostavitev/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
-
     - name: Install MySQL client
       run: sudo apt-get update && sudo apt-get install -y default-mysql-client
 
@@ -93,21 +85,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
 
-    - name: Cache node_modules
-      uses: actions/cache@v3
-      with:
-        path: Frontend/node_modules
-        key: ${{ runner.os }}-node-modules-${{ hashFiles('Frontend/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-modules-
-
     - name: Install dependencies
       working-directory: ./Frontend
       run: npm ci
-
-    - name: Build frontend
-      working-directory: ./Frontend
-      run: npm run build || true
 
     - name: Build project (start server)
       working-directory: ./Frontend
@@ -138,6 +118,7 @@ jobs:
   build-docker-images:
     needs: [build-backend, build-frontend]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
     - name: Checkout repository
@@ -175,7 +156,6 @@ jobs:
   deploy-firebase:
     needs: [build-frontend]
     runs-on: ubuntu-latest
-    # Deploy samo na main branch
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
