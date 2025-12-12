@@ -1,5 +1,5 @@
 {
   "projects": {
-    "auxilium-application": "auxilium-application"
+    "default": "auxilium-application"
   }
 }
