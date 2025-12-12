@@ -29,4 +29,7 @@ async function loadNesrece() {
     }
 }
 
-loadNesrece();
+// Auto-load samo če ni v test okolju
+if (typeof jest === 'undefined') {
+    loadNesrece();
+}

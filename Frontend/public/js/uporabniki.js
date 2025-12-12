@@ -29,7 +29,9 @@ async function loadUporabniki() {
     }
 }
 
-document.getElementById('uporabnikForm').addEventListener('submit', async (e) => {
+// Event listener samo če element obstaja
+if (document.getElementById('uporabnikForm')) {
+    document.getElementById('uporabnikForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = {
@@ -58,6 +60,10 @@ document.getElementById('uporabnikForm').addEventListener('submit', async (e) =>
     } catch (error) {
         alert('Napaka: ' + error.message);
     }
-});
+    });
+}
 
-loadUporabniki();
+// Auto-load samo če ni v test okolju
+if (typeof jest === 'undefined') {
+    loadUporabniki();
+}

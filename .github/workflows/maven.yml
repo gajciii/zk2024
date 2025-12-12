@@ -44,7 +44,6 @@ jobs:
     - name: Wait for MySQL
       run: |
         until mysqladmin ping -h127.0.0.1 -uadmin -padmin --silent; do
-          echo "Waiting for database connection..."
           sleep 2
         done
 
@@ -70,6 +69,7 @@ jobs:
         retention-days: 30
 
   build-frontend:
+    needs: build-backend
     runs-on: ubuntu-latest
     container: node:18
 
@@ -89,7 +89,7 @@ jobs:
       working-directory: ./Frontend
       run: npm ci
 
-    - name: Build project
+    - name: Build project (start server)
       working-directory: ./Frontend
       run: npm start &
       timeout-minutes: 1

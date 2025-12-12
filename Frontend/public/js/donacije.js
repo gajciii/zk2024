@@ -29,7 +29,9 @@ async function loadDonacije() {
     }
 }
 
-document.getElementById('donacijaForm').addEventListener('submit', async (e) => {
+// Event listener samo če element obstaja
+if (document.getElementById('donacijaForm')) {
+    document.getElementById('donacijaForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = {
@@ -59,6 +61,10 @@ document.getElementById('donacijaForm').addEventListener('submit', async (e) => 
     } catch (error) {
         alert('Napaka: ' + error.message);
     }
-});
+    });
+}
 
-loadDonacije();
+// Auto-load samo če ni v test okolju
+if (typeof jest === 'undefined') {
+    loadDonacije();
+}
