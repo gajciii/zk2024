@@ -7,5 +7,4 @@ target/
 .vscode/
 *.log
 HELP.md
-.mvn/wrapper/maven-wrapper.properties
 mvnw.cmd
