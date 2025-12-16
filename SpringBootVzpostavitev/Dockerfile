@@ -9,8 +9,10 @@ COPY mvnw pom.xml ./
 # Kopiraj preostale datoteke
 COPY . .
 
-# Dodeli izvršljive pravice za mvnw (po zadnjem COPY, da se pravice ne prepišejo)
-RUN chmod +x ./mvnw
+# Dodeli izvršljive pravice in odstrani CRLF iz wrapper datotek (včasih Git/Windows doda \r)
+RUN chmod +x ./mvnw \
+    && sed -i 's/\r$//' ./mvnw \
+    && sed -i 's/\r$//' .mvn/wrapper/maven-wrapper.properties
 
 # Gradi aplikacijo
 RUN ./mvnw clean package -DskipTests
