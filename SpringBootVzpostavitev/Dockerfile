@@ -6,11 +6,11 @@ WORKDIR /app
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
 
-# Dodeli izvršljive pravice za mvnw
-RUN chmod +x ./mvnw
-
 # Kopiraj preostale datoteke
 COPY . .
+
+# Dodeli izvršljive pravice za mvnw (po zadnjem COPY, da se pravice ne prepišejo)
+RUN chmod +x ./mvnw
 
 # Gradi aplikacijo
 RUN ./mvnw clean package -DskipTests
