@@ -2,20 +2,15 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Kopiraj Maven wrapper (mora biti pred COPY . .)
-COPY .mvn .mvn
-COPY mvnw pom.xml ./
+# Namesti Maven
+RUN apt-get update && apt-get install -y maven
 
-# Kopiraj preostale datoteke
-COPY . .
-
-# Dodeli izvršljive pravice in odstrani CRLF iz wrapper datotek (včasih Git/Windows doda \r)
-RUN chmod +x ./mvnw \
-    && sed -i 's/\r$//' ./mvnw \
-    && sed -i 's/\r$//' .mvn/wrapper/maven-wrapper.properties
+# Kopiraj pom.xml in source
+COPY pom.xml ./
+COPY src ./src
 
 # Gradi aplikacijo
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Eksponiraj port
 EXPOSE 8080
