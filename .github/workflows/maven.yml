@@ -48,7 +48,7 @@ jobs:
         done
 
     - name: Build with Maven
-      run: mvn -f SpringBootVzpostavitev/pom.xml clean install
+      run: mvn -f SpringBootVzpostavitev/pom.xml clean package -DskipTests
 
     - name: Run tests with Maven and generate coverage
       run: mvn -f SpringBootVzpostavitev/pom.xml test jacoco:report
@@ -64,7 +64,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: backend-build
-        path: SpringBootVzpostavitev/target/ris-*.jar
+        path: SpringBootVzpostavitev/target/*.jar
         if-no-files-found: error
         retention-days: 30
 
@@ -132,7 +132,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      
+
     - name: Download backend jar artifact
       uses: actions/download-artifact@v4
       with:
