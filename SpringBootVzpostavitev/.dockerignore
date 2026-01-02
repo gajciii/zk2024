@@ -1,4 +1,6 @@
-target/
+target/*
+!target/*.jar
+
 .git/
 .gitignore
 .DS_Store
