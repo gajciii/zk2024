@@ -256,6 +256,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
+      - name: Build backend (compile classes)
+        run: mvn -f SpringBootVzpostavitev/pom.xml clean verify
+
       - name: Install dependencies (frontend)
         run: |
           cd Frontend
