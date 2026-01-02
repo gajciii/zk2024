@@ -181,7 +181,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      
+
     - name: Download backend jar artifact
       uses: actions/download-artifact@v4
       with:
@@ -193,9 +193,12 @@ jobs:
 
     - name: Check SonarCloud Quality Gate
       run: |
-        STATUS=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
-          "https://sonarcloud.io/api/qualitygates/project_status?projectKey=gajciii_zk2024&branch=production" \
-          | sed -n 's/.*"status":"\([^"]*\)".*/\1/p')
+        JSON=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
+          "https://sonarcloud.io/api/qualitygates/project_status?projectKey=gajciii_zk2024&branch=production")
+
+        echo "$JSON" | jq .
+
+        STATUS=$(echo "$JSON" | jq -r '.projectStatus.status')
         echo "Quality Gate status: $STATUS"
         test "$STATUS" = "OK"
 
