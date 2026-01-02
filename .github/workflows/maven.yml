@@ -184,8 +184,11 @@ jobs:
 
     - name: Check SonarCloud Quality Gate
       run: |
-        curl -u ${{ secrets.SONAR_TOKEN }}: \
-          "https://sonarcloud.io/api/project_badges/measure?project=gajciii_zk2024&metric=alert_status" | grep -q '"status":"OK"' || exit 1
+        STATUS=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
+          "https://sonarcloud.io/api/qualitygates/project_status?projectKey=gajciii_zk2024&branch=production" \
+          | sed -n 's/.*"status":"\([^"]*\)".*/\1/p')
+        echo "Quality Gate status: $STATUS"
+        test "$STATUS" = "OK"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
