@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uporabniki - Auxilium</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a href="/" class="logo">Auxilium</a>
+                <ul class="nav-links">
+                    <li><a href="/">Domov</a></li>
+                    <li><a href="/uporabniki.html">Uporabniki</a></li>
+                    <li><a href="/donacije.html">Donacije</a></li>
+                    <li><a href="/nesrece.html">Nesreče</a></li>
+                    <li><a href="/oskodovanci.html">Oškodovanci</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="container">
+        <h1>Uporabniki</h1>
+        
+        <div id="errorMessage" class="alert alert-error" style="display: none;"></div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ime</th>
+                        <th>Priimek</th>
+                        <th>Email</th>
+                        <th>Telefonska številka</th>
+                    </tr>
+                </thead>
+                <tbody id="uporabnikiTable">
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Nalaganje...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-section">
+            <h2>Dodaj novega uporabnika</h2>
+            <form id="uporabnikForm">
+                <div class="form-group">
+                    <label for="ime">Ime:</label>
+                    <input type="text" id="ime" name="ime" required>
+                </div>
+                <div class="form-group">
+                    <label for="priimek">Priimek:</label>
+                    <input type="text" id="priimek" name="priimek" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefon">Telefonska številka:</label>
+                    <input type="text" id="telefon" name="telefon" required>
+                </div>
+                <button type="submit" class="btn">Dodaj uporabnika</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Auxilium - Sistem za upravljanje pomoči v nesrečah</p>
+        </div>
+    </footer>
+
+    <script src="/js/uporabniki.js"></script>
+</body>
+</html>

@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-backend:
     runs-on: ubuntu-latest
 
     services:
@@ -35,16 +35,274 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        cache: 'maven'
+        cache-dependency-path: 'SpringBootVzpostavitev/pom.xml'
+
+    - name: Install MySQL client
+      run: sudo apt-get update && sudo apt-get install -y default-mysql-client
 
     - name: Wait for MySQL
       run: |
         until mysqladmin ping -h127.0.0.1 -uadmin -padmin --silent; do
-          echo "Waiting for database connection..."
           sleep 2
         done
 
     - name: Build with Maven
-      run: mvn -f SpringBootVzpostavitev/pom.xml clean install
+      run: mvn -f SpringBootVzpostavitev/pom.xml clean package -DskipTests
 
-    - name: Run tests with Maven
-      run: mvn -f SpringBootVzpostavitev/pom.xml test
+    - name: Run tests with Maven and generate coverage
+      run: mvn -f SpringBootVzpostavitev/pom.xml test jacoco:report
+    
+    - name: Upload SpringBootVzpostavitev coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: SpringBootVzpostavitev-coverage
+        path: SpringBootVzpostavitev/target/site/jacoco
+        if-no-files-found: warn
+
+    - name: Upload backend build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-build
+        path: SpringBootVzpostavitev/target/*.jar
+        if-no-files-found: error
+        retention-days: 30
+
+  build-frontend:
+    needs: build-backend
+    runs-on: ubuntu-latest
+    container: node:18
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Cache npm dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('Frontend/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Check for package-lock.json
+      working-directory: ./Frontend
+      run: |
+        if [ ! -f package-lock.json ]; then
+          echo "Error: package-lock.json is missing. Please commit it to the repository."
+          exit 1
+        fi
+
+    - name: Install dependencies
+      working-directory: ./Frontend
+      run: npm ci
+
+    - name: Build project (start server)
+      working-directory: ./Frontend
+      run: npm start &
+      timeout-minutes: 1
+
+    - name: Run tests with coverage
+      working-directory: ./Frontend
+      run: npm run test -- --coverage --watchAll=false
+
+    - name: Upload Frontend coverage artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: Frontend-coverage
+        path: Frontend/coverage
+        if-no-files-found: warn
+
+    - name: Upload frontend build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: |
+          Frontend/dist
+          Frontend/public
+        if-no-files-found: warn
+        retention-days: 30
+
+  dockerize-and-push-dev:
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    environment: Development
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Download backend jar artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: backend-build
+        path: SpringBootVzpostavitev/target
+        
+    - name: List backend target folder
+      run: ls -la SpringBootVzpostavitev/target
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push backend Docker image (dev)
+      uses: docker/build-push-action@v5
+      with:
+        context: ./SpringBootVzpostavitev
+        file: ./SpringBootVzpostavitev/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-backend:dev
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push frontend Docker image (dev)
+      uses: docker/build-push-action@v5
+      with:
+        context: ./Frontend
+        file: ./Frontend/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-frontend:dev
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  dockerize-and-push-prod:
+    needs: [build-backend, build-frontend, sonarcloud-analysis]
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+    if: github.ref == 'refs/heads/production'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Check SonarCloud Quality Gate
+      run: |
+        curl -u ${{ secrets.SONAR_TOKEN }}: \
+          "https://sonarcloud.io/api/project_badges/measure?project=gajciii_zk2024&metric=alert_status" | grep -q '"status":"OK"' || exit 1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push backend Docker image (prod)
+      uses: docker/build-push-action@v5
+      with:
+        context: ./SpringBootVzpostavitev
+        file: ./SpringBootVzpostavitev/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-backend:prod
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push frontend Docker image (prod)
+      uses: docker/build-push-action@v5
+      with:
+        context: ./Frontend
+        file: ./Frontend/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-frontend:prod
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  deploy-firebase:
+    needs: [build-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Download frontend build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-build
+        path: Frontend/
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: Frontend/package-lock.json
+
+    - name: Install Firebase CLI
+      run: npm install -g firebase-tools
+
+    - name: Deploy to Firebase Hosting
+      env:
+        FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      run: firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" --token "$FIREBASE_TOKEN" --non-interactive
+
+  sonarcloud-analysis:
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    environment:
+      name: Development
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Setup Java 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Build backend (compile only, skip tests)
+        run: mvn -f SpringBootVzpostavitev/pom.xml -DskipTests clean package
+
+      - name: Install dependencies (frontend)
+        run: |
+          cd Frontend
+          npm ci
+      - name: Collect coverage (frontend)
+        run: |
+          cd Frontend
+          npm run test -- --coverage --watchAll=false
+        env:
+          CI: true
+      - name: Run SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          npx sonar-scanner \
+            -Dsonar.projectKey=gajciii_zk2024 \
+            -Dsonar.organization=gajciii \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.sources=. \
+            -Dsonar.exclusions=**/node_modules/**,**/dist/** \
+            -Dsonar.javascript.lcov.reportPaths=Frontend/coverage/lcov.info
+
+  deploy-pages:
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs

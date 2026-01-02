@@ -32,11 +32,6 @@ public interface UporabnikRepository extends JpaRepository<Uporabnik, Long> {
     @Query("SELECT DISTINCT new si.um.feri.ris.models.Uporabnik(u.ime, u.priimek, u.uporabniskoIme) FROM Uporabnik u JOIN u.donacije d ")
     List<Uporabnik> najdiUporabnikeKiSoDonirali();
 
-    @Query("SELECT u FROM Uporabnik u JOIN u.donacije d GROUP BY u HAVING COUNT(d) > 1")
-    List<Uporabnik> najdiVeckratneDonatorje();
-
-
-
     @Query("SELECT u FROM Uporabnik u " +
             "JOIN u.donacije d " +
             "GROUP BY u.id " +

@@ -44,9 +44,10 @@ public class AdminiTesti {
     }
 
 
+    // Testira uspešno prijavo administratorja
     @Test
     @Transactional
-    void testPrijavaAdmina() { // uspešna prijava administratorja
+    void testPrijavaAdmina() {
 
         Administrator admin = new Administrator();
         admin.setUporabniskoIme("adminTest");
@@ -62,8 +63,9 @@ public class AdminiTesti {
 
 
 
+    // Testira dodajanje nesreče s strani administratorja
     @Test
-    public void testDodajNesreco() { // dodajanje nesreče
+    public void testDodajNesreco() {
 
         Administrator admin = new Administrator();
         admin.setUporabniskoIme("adminTest");
@@ -90,6 +92,81 @@ public class AdminiTesti {
         administratorDAO.deleteAll();
     }
 
-}
+    // Testira neuspešno prijavo administratorja z napačnim geslom
+    @Test
+    @Transactional
+    void testNeuspesnaPrijavaAdmina() {
+        Administrator admin = new Administrator();
+        admin.setUporabniskoIme("adminTest");
+        admin.setGeslo("adminGeslo");
+        administratorDAO.save(admin);
 
+        Administrator napačenAdmin = new Administrator();
+        napačenAdmin.setUporabniskoIme("adminTest");
+        napačenAdmin.setGeslo("napačnoGeslo");
+
+        ResponseEntity<String> response = administratorController.prijavaAdmina(napačenAdmin);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    // Testira dodajanje novega administratorja
+    @Test
+    @Transactional
+    void testDodajAdministratorja() {
+        Administrator novAdmin = new Administrator();
+        novAdmin.setUporabniskoIme("noviAdmin");
+        novAdmin.setGeslo("geslo123");
+
+        ResponseEntity<String> response = administratorController.dodajAdministratorja(novAdmin);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("uspešno dodan"));
+    }
+
+    // Testira registracijo novega administratorja
+    @Test
+    @Transactional
+    void testRegistracijaAdmina() {
+        Administrator novAdmin = new Administrator();
+        novAdmin.setUporabniskoIme("noviAdmin");
+        novAdmin.setGeslo("geslo123");
+
+        ResponseEntity<String> response = administratorController.regisracijaAdmina(novAdmin);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("uspešno registriran"));
+    }
+
+    // Testira dodajanje oškodovanca s strani administratorja
+    @Test
+    @Transactional
+    void testDodajOskodovanca() {
+        Oskodovanec novOskodovanec = new Oskodovanec();
+        novOskodovanec.setIme("Janez");
+        novOskodovanec.setPriimek("Novak");
+
+        ResponseEntity<Oskodovanec> response = administratorController.dodajOskodovanca(novOskodovanec);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Janez", response.getBody().getIme());
+    }
+
+    // Testira odstranjevanje oškodovanca s strani administratorja
+    @Test
+    @Transactional
+    void testOdstraniOskodovanca() {
+        Oskodovanec oskodovanec = new Oskodovanec();
+        oskodovanec.setIme("Janez");
+        oskodovanec.setPriimek("Novak");
+        oskodovanec = oskodovancevDAO.save(oskodovanec);
+
+        ResponseEntity<String> response = administratorController.odstraniOskodovanca(oskodovanec.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("uspešno odstranjen"));
+    }
+
+}
 
