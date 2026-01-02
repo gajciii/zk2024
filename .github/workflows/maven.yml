@@ -118,13 +118,14 @@ jobs:
         if-no-files-found: warn
         retention-days: 30
 
-  build-docker-images:
+  dockerize-and-push-dev:
     needs: [build-backend, build-frontend]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: Development
+    if: github.ref == 'refs/heads/main'
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set up Docker Buildx
@@ -136,23 +137,68 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push backend Docker image
+    - name: Build and push backend Docker image (dev)
       uses: docker/build-push-action@v5
       with:
         context: ./SpringBootVzpostavitev
         file: ./SpringBootVzpostavitev/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-backend:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-backend:dev
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Build and push frontend Docker image
+    - name: Build and push frontend Docker image (dev)
       uses: docker/build-push-action@v5
       with:
         context: ./Frontend
         file: ./Frontend/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-frontend:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-frontend:dev
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  dockerize-and-push-prod:
+    needs: [build-backend, build-frontend, sonarcloud-analysis]
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+    if: github.ref == 'refs/heads/production'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Check SonarCloud Quality Gate
+      run: |
+        curl -u ${{ secrets.SONAR_TOKEN }}: \
+          "https://sonarcloud.io/api/project_badges/measure?project=gajciii_zk2024&metric=alert_status" | grep -q '"status":"OK"' || exit 1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push backend Docker image (prod)
+      uses: docker/build-push-action@v5
+      with:
+        context: ./SpringBootVzpostavitev
+        file: ./SpringBootVzpostavitev/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-backend:prod
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push frontend Docker image (prod)
+      uses: docker/build-push-action@v5
+      with:
+        context: ./Frontend
+        file: ./Frontend/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/auxilium-frontend:prod
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -186,3 +232,59 @@ jobs:
         FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
       run: firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" --token "$FIREBASE_TOKEN" --non-interactive
+
+  sonarcloud-analysis:
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    environment:
+      name: Development
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Setup Java 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Install dependencies (frontend)
+        run: |
+          cd Frontend
+          npm ci
+      - name: Collect coverage (frontend)
+        run: |
+          cd Frontend
+          npm run test -- --coverage --watchAll=false
+        env:
+          CI: true
+      - name: Run SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          npx sonar-scanner \
+            -Dsonar.projectKey=gajciii_zk2024 \
+            -Dsonar.organization=gajciii \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.sources=. \
+            -Dsonar.exclusions=**/node_modules/**,**/dist/** \
+            -Dsonar.javascript.lcov.reportPaths=Frontend/coverage/lcov.info
+
+  deploy-pages:
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
